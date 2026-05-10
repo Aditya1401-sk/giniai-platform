@@ -10,15 +10,21 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showWakeUpMessage, setShowWakeUpMessage] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setShowWakeUpMessage(false);
+    const wakeUpTimer = setTimeout(() => setShowWakeUpMessage(true), 3000);
+
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/login`, {
         email,
         password,
       });
+      clearTimeout(wakeUpTimer);
+      setShowWakeUpMessage(false);
 
       const role = response.data.role.toLowerCase();
       localStorage.setItem("token", response.data.access_token);
@@ -41,10 +47,15 @@ export default function Login() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
+    setShowWakeUpMessage(false);
+    const wakeUpTimer = setTimeout(() => setShowWakeUpMessage(true), 3000);
+
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/google`, {
         credential: credentialResponse.credential
       });
+      clearTimeout(wakeUpTimer);
+      setShowWakeUpMessage(false);
 
       const role = response.data.role.toLowerCase();
       localStorage.setItem("token", response.data.access_token);
@@ -116,19 +127,31 @@ export default function Login() {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-[var(--accent-primary)] text-white rounded-lg font-medium text-sm hover:bg-[var(--accent-hover)] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 mt-6"
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <>
-                Sign In <IconLogIn size={16} />
-              </>
+          <div className="space-y-3">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-[var(--accent-primary)] text-white rounded-lg font-medium text-sm hover:bg-[var(--accent-hover)] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 mt-6"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  Sign In <IconLogIn size={16} />
+                </>
+              )}
+            </button>
+            
+            {showWakeUpMessage && loading && (
+              <motion.p 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-[10px] text-amber-500 font-medium text-center bg-amber-500/5 py-2 rounded-lg border border-amber-500/10"
+              >
+                ⚡ Server is waking up from idle, please wait a moment...
+              </motion.p>
             )}
-          </button>
+          </div>
 
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
