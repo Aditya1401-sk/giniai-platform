@@ -8,8 +8,8 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
 def get_ai_response_stream(prompt: str):
-    # Using the extremely fast and stable Gemini 2.0 Flash
-    model = genai.GenerativeModel('gemini-2.0-flash')
+    # Using the extremely stable Gemini 1.5 Flash
+    model = genai.GenerativeModel('gemini-1.5-flash')
     
     try:
         # Stream the response
