@@ -64,9 +64,9 @@ function AdminDashboard() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("email");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("role");
+    sessionStorage.removeItem("email");
     window.location.href = "/";
   };
 
@@ -74,7 +74,7 @@ function AdminDashboard() {
     e.preventDefault();
     if (!message.trim()) return;
 
-    const userEmail = localStorage.getItem("email") || "admin";
+    const userEmail = sessionStorage.getItem("email") || "admin";
     const userMsg = { role: "user", content: message };
     const botPlaceholder = { role: "bot", content: "" };
     setChatHistory(prev => [...prev, userMsg, botPlaceholder]);

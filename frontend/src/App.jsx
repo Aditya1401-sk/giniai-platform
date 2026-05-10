@@ -9,8 +9,8 @@ import DeveloperDashboard from "./pages/DeveloperDashboard";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 function App() {
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
+  const token = sessionStorage.getItem("token");
+  const role = sessionStorage.getItem("role");
 
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>

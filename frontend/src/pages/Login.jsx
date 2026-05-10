@@ -21,10 +21,10 @@ export default function Login() {
       });
 
       const role = response.data.role.toLowerCase();
-      localStorage.setItem("token", response.data.access_token);
-      localStorage.setItem("role", role);
-      localStorage.setItem("email", email);
-      localStorage.setItem("profile_pic", response.data.profile_pic || "");
+      sessionStorage.setItem("token", response.data.access_token);
+      sessionStorage.setItem("role", role);
+      sessionStorage.setItem("email", email);
+      sessionStorage.setItem("profile_pic", response.data.profile_pic || "");
       sessionStorage.setItem("just_logged_in", "true");
       
       if (role === "admin") {
@@ -47,10 +47,10 @@ export default function Login() {
       });
 
       const role = response.data.role.toLowerCase();
-      localStorage.setItem("token", response.data.access_token);
-      localStorage.setItem("role", role);
-      localStorage.setItem("email", response.data.email || "google-user"); 
-      localStorage.setItem("profile_pic", response.data.profile_pic || "");
+      sessionStorage.setItem("token", response.data.access_token);
+      sessionStorage.setItem("role", role);
+      sessionStorage.setItem("email", response.data.email || "google-user"); 
+      sessionStorage.setItem("profile_pic", response.data.profile_pic || "");
       sessionStorage.setItem("just_logged_in", "true");
 
       window.location.href = `/${role}`;

@@ -4,11 +4,11 @@ import axios from "axios";
 import { API_BASE_URL } from "../config";
 
 export default function ProfileModal({ onClose }) {
-  const email = localStorage.getItem("email") || "";
+  const email = sessionStorage.getItem("email") || "";
   const defaultName = email.split("@")[0];
   const [displayName, setDisplayName] = useState(defaultName);
   const [username, setUsername] = useState(defaultName);
-  const [profilePic, setProfilePic] = useState(localStorage.getItem("profile_pic") || "");
+  const [profilePic, setProfilePic] = useState(sessionStorage.getItem("profile_pic") || "");
   const [saved, setSaved] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef(null);
@@ -30,7 +30,7 @@ export default function ProfileModal({ onClose }) {
       });
       const newUrl = response.data.url;
       setProfilePic(newUrl);
-      localStorage.setItem("profile_pic", newUrl);
+      sessionStorage.setItem("profile_pic", newUrl);
     } catch (error) {
       console.error("Upload failed", error);
       alert("Failed to upload profile picture");

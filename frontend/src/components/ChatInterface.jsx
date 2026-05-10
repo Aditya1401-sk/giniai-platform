@@ -15,7 +15,7 @@ import {
 import { API_BASE_URL } from "../config";
 
 const ChatInterface = ({ roleTitle }) => {
-  const userEmail = localStorage.getItem("email") || "guest";
+  const userEmail = sessionStorage.getItem("email") || "guest";
   const storageKey = `chat_v2_${userEmail}_${roleTitle.toLowerCase()}`;
 
   const [sessions, setSessions] = useState(() => {
@@ -65,9 +65,9 @@ const ChatInterface = ({ roleTitle }) => {
   }, [chatHistory]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("email");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("role");
+    sessionStorage.removeItem("email");
     // Clear all session visited flags to ensure fresh chat on next login
     Object.keys(sessionStorage).forEach(key => {
       if (key.startsWith('visited_')) sessionStorage.removeItem(key);
@@ -126,7 +126,7 @@ const ChatInterface = ({ roleTitle }) => {
     const trimmedMsg = message.trim();
     if (!trimmedMsg && !pendingFile) return;
 
-    const role = localStorage.getItem("role") || "guest";
+    const role = sessionStorage.getItem("role") || "guest";
 
     let userContent = trimmedMsg;
     if (pendingFile && trimmedMsg) {

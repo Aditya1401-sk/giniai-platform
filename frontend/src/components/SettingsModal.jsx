@@ -103,10 +103,10 @@ const DataTab = () => {
 const AccountTab = ({ onClose, handleLogout }) => (
   <div>
     <Row label="Email address" sub="The email associated with your account.">
-      <span className="text-sm text-[var(--text-secondary)]">{localStorage.getItem("email") || "—"}</span>
+      <span className="text-sm text-[var(--text-secondary)]">{sessionStorage.getItem("email") || "—"}</span>
     </Row>
     <Row label="Role" sub="Your platform access level.">
-      <span className="text-xs px-2.5 py-1 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] rounded-full font-medium capitalize">{localStorage.getItem("role") || "—"}</span>
+      <span className="text-xs px-2.5 py-1 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] rounded-full font-medium capitalize">{sessionStorage.getItem("role") || "—"}</span>
     </Row>
     <Row label="Log out" sub="Sign out from all devices.">
       <button onClick={handleLogout} className="text-xs px-3 py-1.5 border border-red-500/30 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors">Log out</button>

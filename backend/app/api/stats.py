@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from app.db.database import users_collection, db
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 router = APIRouter()
 
@@ -34,8 +34,6 @@ async def get_logs():
         ts_ist = ts.astimezone(ist)
         log["time"] = ts_ist.strftime("%I:%M %p")
     return logs
-
-from datetime import datetime, timedelta, timezone
 
 def add_log(event: str, log_type: str = "sys", user_email: str = "unknown"):
     # Use Indian Standard Time (UTC+5:30)
