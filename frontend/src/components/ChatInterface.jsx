@@ -65,8 +65,8 @@ const ChatInterface = ({ roleTitle }) => {
   }, [chatHistory]);
 
   const handleLogout = () => {
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("role");
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
     sessionStorage.removeItem("email");
     // Clear all session visited flags to ensure fresh chat on next login
     Object.keys(sessionStorage).forEach(key => {

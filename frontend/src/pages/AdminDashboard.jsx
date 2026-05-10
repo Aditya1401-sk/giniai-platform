@@ -64,8 +64,8 @@ function AdminDashboard() {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("role");
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
     sessionStorage.removeItem("email");
     window.location.href = "/";
   };
