@@ -31,11 +31,12 @@ async def get_logs():
 
 from datetime import datetime, timedelta, timezone
 
-def add_log(event: str, log_type: str = "sys"):
+def add_log(event: str, log_type: str = "sys", user_email: str = "unknown"):
     # Use Indian Standard Time (UTC+5:30)
     ist = timezone(timedelta(hours=5, minutes=30))
     logs_collection.insert_one({
         "event": event,
         "type": log_type,
+        "user_email": user_email,
         "timestamp": datetime.now(ist)
     })

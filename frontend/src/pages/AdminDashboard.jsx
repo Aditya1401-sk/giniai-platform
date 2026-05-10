@@ -73,6 +73,7 @@ function AdminDashboard() {
     e.preventDefault();
     if (!message.trim()) return;
 
+    const userEmail = localStorage.getItem("email") || "admin";
     const userMsg = { role: "user", content: message };
     const botPlaceholder = { role: "bot", content: "" };
     setChatHistory(prev => [...prev, userMsg, botPlaceholder]);
@@ -83,7 +84,7 @@ function AdminDashboard() {
       const response = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, role: "admin" })
+        body: JSON.stringify({ message, role: "admin", email: userEmail })
       });
 
       if (!response.body) return;
@@ -109,6 +110,17 @@ function AdminDashboard() {
     } catch (error) {
       console.error("Stream error:", error);
       setIsTyping(false);
+    }
+  };
+
+  const handleDeleteUser = async (email) => {
+    if (window.confirm(`Are you sure you want to remove ${email} from the platform?`)) {
+      try {
+        await axios.delete(`${API_BASE_URL}/auth/users/${email}`);
+        fetchStatsAndLogs();
+      } catch (error) {
+        alert(error.response?.data?.detail || "Error deleting user");
+      }
     }
   };
 
@@ -182,13 +194,29 @@ function AdminDashboard() {
                   <div className="text-center py-10 text-[var(--text-secondary)] text-sm">No activity recorded yet.</div>
                 ) : (
                   logs.map((log) => (
-                    <div key={log._id} className="flex gap-3">
+                    <div key={log._id} className="flex gap-3 group/log">
                       <div className="flex flex-col items-center pt-1.5">
                         <div className={`w-2 h-2 rounded-full ${log.type === 'ai' ? 'bg-cyan-500' : log.type === 'auth' ? 'bg-[var(--accent-primary)]' : 'bg-gray-500'}`} />
                         <div className="w-[1px] h-full bg-[var(--border-color)] mt-1.5" />
                       </div>
                       <div className="flex-1 pb-4">
-                        <p className="text-sm text-[var(--text-primary)] font-medium leading-tight mb-1">{log.event}</p>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="text-sm text-[var(--text-primary)] font-medium leading-tight mb-1">{log.event}</p>
+                            {log.user_email && log.user_email !== "unknown" && (
+                              <p className="text-[10px] text-[var(--accent-primary)] font-mono mb-1">{log.user_email}</p>
+                            )}
+                          </div>
+                          {log.user_email && log.user_email !== "unknown" && log.type === "ai" && (
+                            <button 
+                              onClick={() => handleDeleteUser(log.user_email)}
+                              className="p-1.5 text-red-400 hover:bg-red-500/10 rounded opacity-0 group-hover/log:opacity-100 transition-opacity"
+                              title="Remove this user"
+                            >
+                              <IconTrash2 size={14} />
+                            </button>
+                          )}
+                        </div>
                         <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
                            <span>{log.time}</span>
                            <span className="opacity-50">•</span>

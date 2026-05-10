@@ -1,13 +1,17 @@
 from pymongo import MongoClient
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
-MONGO_URL = os.getenv("MONGO_URL")
+# LIVE PRODUCTION URL
+MONGO_URL = "mongodb+srv://giniDB:GiniLytics2026@cluster0.nudeyev.mongodb.net/?appName=Cluster0"
 client = MongoClient(MONGO_URL)
 db = client["ginilytics_db"]
 users_collection = db["users"]
 
-print(f"Total users: {users_collection.count_documents({})}")
-for user in users_collection.find():
-    print(f"Email: {user.get('email')}, Role: {user.get('role')}")
+print("\n--- Current Users in Production Database ---")
+users = list(users_collection.find({}, {"_id": 0, "password": 0}))
+
+if not users:
+    print("Database is empty.")
+else:
+    for idx, user in enumerate(users, 1):
+        print(f"{idx}. Name: {user.get('name', 'N/A')} | Email: {user['email']} | Role: {user['role']} | ID: {user.get('custom_id', 'N/A')}")
+print("-------------------------------------------\n")
