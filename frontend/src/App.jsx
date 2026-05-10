@@ -17,26 +17,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* LOGIN PAGE */}
-          <Route
-            path="/"
-            element={
-              token ? (
-                role === "admin" ? (
-                  <Navigate to="/admin" />
-                ) : role === "management" ? (
-                  <Navigate to="/management" />
-                ) : role === "sales" ? (
-                  <Navigate to="/sales" />
-                ) : role === "developer" ? (
-                  <Navigate to="/developer" />
-                ) : (
-                  <Login />
-                )
-              ) : (
-                <Login />
-              )
-            }
-          />
+          <Route path="/" element={<Login />} />
 
           {/* ADMIN */}
           <Route
