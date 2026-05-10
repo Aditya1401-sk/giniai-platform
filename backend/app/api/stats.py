@@ -24,9 +24,15 @@ async def get_logs():
     # Fetch latest 10 logs
     logs = list(logs_collection.find().sort("timestamp", -1).limit(10))
     # Convert MongoDB _id to string for JSON
+    ist = timezone(timedelta(hours=5, minutes=30))
     for log in logs:
         log["_id"] = str(log["_id"])
-        log["time"] = log["timestamp"].strftime("%I:%M %p")
+        # If timestamp is naive or in UTC, replace/convert to IST
+        ts = log["timestamp"]
+        if ts.tzinfo is None:
+            ts = ts.replace(tzinfo=timezone.utc)
+        ts_ist = ts.astimezone(ist)
+        log["time"] = ts_ist.strftime("%I:%M %p")
     return logs
 
 from datetime import datetime, timedelta, timezone
