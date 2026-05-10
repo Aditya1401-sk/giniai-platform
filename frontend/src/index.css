@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-dark: #121212;
+  --color-brand-card: #1e1e1e;
+  --color-brand-primary: #2563eb;
+  --color-brand-secondary: #4b5563;
+}
+
+/* THEME VARIABLES */
+:root {
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --bg-tertiary: #2a2a2a;
+  --bg-input: #1a1a1a;
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --border-color: #333333;
+  --accent-primary: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-danger: #dc2626;
+  --accent-success: #16a34a;
+  --font-main: 'Inter', sans-serif;
+}
+
+.light-theme {
+  --bg-primary: #f9fafb;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f3f4f6;
+  --bg-input: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+  --accent-primary: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-danger: #dc2626;
+  --accent-success: #16a34a;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Global Refinements */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  scroll-behavior: smooth;
+  cursor: default;
+}
+
+::selection {
+  background: var(--accent-primary);
+  color: #fff;
+}
+
+input, select, textarea {
+  font-family: var(--font-main);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Solid Clean Card instead of glass */
+.solid-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.light-theme .solid-card {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* Markdown Styles */
+.prose pre {
+  background-color: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.prose code {
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
