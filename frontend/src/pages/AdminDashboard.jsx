@@ -17,7 +17,8 @@ import {
   IconChevronUp, 
   IconZap, 
   IconGlobe, 
-  IconCpu 
+  IconCpu,
+  IconTrash2
 } from "../components/Icons";
 
 function AdminDashboard() {
