@@ -11,13 +11,13 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 def get_ai_response_stream(prompt: str):
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "HTTP-Referer": "http://localhost:5174",
+        "HTTP-Referer": "https://giniai-platform.vercel.app",
         "X-Title": "GiniAI",
         "Content-Type": "application/json"
     }
 
     payload = {
-        "model": "meta-llama/llama-3-8b-instruct:free",
+        "model": "google/gemini-2.0-flash-exp:free",
         "messages": [
             {"role": "user", "content": prompt}
         ],
