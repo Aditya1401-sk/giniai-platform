@@ -124,7 +124,13 @@ export default function ProfileModal({ onClose }) {
                 onChange={e => setUsername(e.target.value)}
                 className="w-full bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:border-[var(--accent-primary)] transition-colors outline-none"
               />
-              <p className="text-xs text-[var(--text-secondary)] mt-1.5">Your profile helps people recognize you in group chats.</p>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Platform Role</label>
+              <div className="w-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl px-4 py-3 text-sm text-[var(--accent-primary)] font-bold uppercase tracking-wider">
+                {localStorage.getItem("role") || "User"}
+              </div>
+              <p className="text-xs text-[var(--text-secondary)] mt-1.5">Your role determines your workspace permissions.</p>
             </div>
           </div>
 

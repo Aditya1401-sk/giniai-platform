@@ -18,7 +18,8 @@ import {
   IconZap, 
   IconGlobe, 
   IconCpu,
-  IconTrash2
+  IconTrash2,
+  IconUser
 } from "../components/Icons";
 
 function AdminDashboard() {
@@ -35,6 +36,7 @@ function AdminDashboard() {
     { role: "bot", content: "Hello Admin! I am the GiniLytics AI. How can I assist you with platform monitoring today?" }
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const [activeTab, setActiveTab] = useState("analytics"); // analytics, users, profile
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -157,36 +159,54 @@ function AdminDashboard() {
           </div>
         </div>
 
-        {/* STATS GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {statCards.map((card) => (
-            <div key={card.title} className="solid-card p-6 flex flex-col justify-between h-[160px]">
-              <div className="flex justify-between items-start">
-                <div className={`p-3 rounded-lg ${card.bgClass} ${card.colorClass}`}>
-                  <card.icon size={24} />
-                </div>
-                {card.title === "System Core" && (
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 rounded border border-emerald-500/20 text-[10px] font-bold text-emerald-500 uppercase tracking-wide">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
-                  </div>
-                )}
-              </div>
-              <div>
-                <h2 className="text-[var(--text-secondary)] font-semibold text-xs uppercase tracking-wider mb-1">{card.title}</h2>
-                <div className="text-4xl font-bold tracking-tight tabular-nums">{card.value}</div>
-              </div>
-            </div>
-          ))}
+        {/* TABS */}
+        <div className="flex items-center gap-1 mb-8 bg-[var(--bg-secondary)] p-1 rounded-xl border border-[var(--border-color)] w-fit">
+          <button 
+            onClick={() => setActiveTab("analytics")}
+            className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === 'analytics' ? 'bg-[var(--accent-primary)] text-white shadow-lg' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]'}`}
+          >
+            <IconActivity size={16} /> Analytics
+          </button>
+          <button 
+            onClick={() => setActiveTab("users")}
+            className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === 'users' ? 'bg-[var(--accent-primary)] text-white shadow-lg' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]'}`}
+          >
+            <IconShieldCheck size={16} /> User Management
+          </button>
+          <button 
+            onClick={() => setActiveTab("profile")}
+            className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === 'profile' ? 'bg-[var(--accent-primary)] text-white shadow-lg' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]'}`}
+          >
+            <IconUser size={16} /> Profile
+          </button>
         </div>
 
-        {/* MAIN CONTENT AREA */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          <div className="lg:col-span-2">
-            <UserManagement onUserUpdate={fetchStatsAndLogs} />
-          </div>
+        {activeTab === "analytics" && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            {/* STATS GRID */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+              {statCards.map((card) => (
+                <div key={card.title} className="solid-card p-6 flex flex-col justify-between h-[160px]">
+                  <div className="flex justify-between items-start">
+                    <div className={`p-3 rounded-lg ${card.bgClass} ${card.colorClass}`}>
+                      <card.icon size={24} />
+                    </div>
+                    {card.title === "System Core" && (
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 rounded border border-emerald-500/20 text-[10px] font-bold text-emerald-500 uppercase tracking-wide">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <h2 className="text-[var(--text-secondary)] font-semibold text-xs uppercase tracking-wider mb-1">{card.title}</h2>
+                    <div className="text-4xl font-bold tracking-tight tabular-nums">{card.value}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-          <div className="lg:col-span-1">
-            <div className="solid-card p-6 h-[600px] flex flex-col">
+            {/* LOGS AREA */}
+            <div className="solid-card p-6 min-h-[400px] flex flex-col">
               <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-6 flex items-center gap-2 border-b border-[var(--border-color)] pb-4">
                 <IconActivity size={18} className="text-[var(--accent-primary)]" /> System Logs
               </h2>
@@ -229,8 +249,40 @@ function AdminDashboard() {
                 )}
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        )}
+
+        {activeTab === "users" && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <UserManagement onUserUpdate={fetchStatsAndLogs} />
+          </motion.div>
+        )}
+
+        {activeTab === "profile" && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="solid-card p-10 max-w-2xl mx-auto">
+             <div className="flex flex-col items-center text-center">
+                <div className="w-24 h-24 rounded-full bg-[var(--accent-primary)] flex items-center justify-center text-white text-3xl font-bold mb-6 shadow-xl">
+                  {sessionStorage.getItem("email")?.[0]?.toUpperCase()}
+                </div>
+                <h2 className="text-2xl font-bold mb-2">{sessionStorage.getItem("email")?.split('@')[0]}</h2>
+                <p className="text-[var(--text-secondary)] mb-6">{sessionStorage.getItem("email")}</p>
+                <div className="px-4 py-1.5 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] rounded-full text-xs font-bold uppercase tracking-widest border border-[var(--accent-primary)]/20">
+                   Role: Administrator
+                </div>
+             </div>
+             
+             <div className="grid grid-cols-2 gap-4 mt-12 border-t border-[var(--border-color)] pt-8">
+                <div className="p-4 bg-[var(--bg-tertiary)] rounded-xl border border-[var(--border-color)]">
+                   <p className="text-[10px] uppercase font-bold text-[var(--text-secondary)] mb-1">Account Type</p>
+                   <p className="text-sm font-semibold">Corporate Admin</p>
+                </div>
+                <div className="p-4 bg-[var(--bg-tertiary)] rounded-xl border border-[var(--border-color)]">
+                   <p className="text-[10px] uppercase font-bold text-[var(--text-secondary)] mb-1">Security Level</p>
+                   <p className="text-sm font-semibold text-emerald-500">Tier 1 (Root)</p>
+                </div>
+             </div>
+          </motion.div>
+        )}
       </div>
 
       {/* FLOATING AI CHAT */}
