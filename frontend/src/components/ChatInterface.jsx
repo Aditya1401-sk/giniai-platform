@@ -206,7 +206,7 @@ const ChatInterface = ({ roleTitle }) => {
       const aiResponse = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: docPrompt, role, email: userEmail })
+        body: JSON.stringify({ message: docPrompt, role, email: userEmail, history: chatHistory })
       });
       if (!aiResponse.body) return;
       const reader = aiResponse.body.getReader();

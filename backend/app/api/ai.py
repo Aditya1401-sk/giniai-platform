@@ -30,12 +30,21 @@ def chat(request: AIRequest):
     context_docs = rag_engine.search(request.message)
     context_text = "\n".join(context_docs) if context_docs else ""
 
-    # 3. Construct Prompt
+    # 3. Construct History Text
+    history_text = ""
+    if request.history:
+        # Take the last 6 messages to keep the prompt size reasonable
+        for chat_msg in request.history[-6:]:
+            role_label = "User" if chat_msg.get('role') == 'user' else "AI"
+            history_text += f"{role_label}: {chat_msg.get('content')}\n"
+
+    # 4. Construct Final Prompt
     if is_asking_for_data and user_role == "admin":
         user_count = users_collection.count_documents({})
         prompt = (
             f"Context: Total Users = {user_count}, Status = Active.\n"
             f"Relevant Docs: {context_text}\n"
+            f"{history_text}"
             f"User: {request.message}\n"
             f"AI:"
         )
@@ -47,6 +56,6 @@ def chat(request: AIRequest):
                 f"--- UPLOADED DOCUMENT CONTEXT ---\n{context_text}\n---------------------------------\n\n"
             )
         
-        prompt = base_prompt + f"User Query: {request.message}\nAI:"
+        prompt = base_prompt + f"{history_text}User Query: {request.message}\nAI:"
 
     return StreamingResponse(get_ai_response_stream(prompt), media_type="text/event-stream")
