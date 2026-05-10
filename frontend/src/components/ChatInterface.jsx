@@ -10,7 +10,7 @@ import {
   IconSend, IconBot, IconUser, IconMessageSquare, IconPlus, IconLogOut, 
   IconClock, IconSettings, IconSearch, IconPaperclip, 
   IconCheckCircle2, IconZap, IconX, IconMoreHorizontal, IconPin, IconShare, IconTrash2,
-  IconChevronRight
+  IconChevronRight, IconMenu2
 } from "../components/Icons";
 import { API_BASE_URL } from "../config";
 
@@ -44,6 +44,7 @@ const ChatInterface = ({ roleTitle }) => {
   const [showSettings, setShowSettings] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const chatEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -204,15 +205,38 @@ const ChatInterface = ({ roleTitle }) => {
 
   return (
     <>
-      <div className="flex h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
+      <div className="flex h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans relative overflow-hidden">
+        {/* MOBILE SIDEBAR OVERLAY */}
+        <AnimatePresence>
+          {sidebarOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSidebarOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
+            />
+          )}
+        </AnimatePresence>
+
         {/* SIDEBAR */}
-        <div className="w-[280px] bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex-col z-20 hidden md:flex">
+        <motion.div 
+          initial={false}
+          animate={{ x: sidebarOpen ? 0 : -280 }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          className={`fixed md:relative w-[280px] h-full bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col z-40 md:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:flex"}`}
+        >
           <div className="p-6 flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="p-2 bg-[var(--accent-primary)] text-white rounded-lg shadow-sm">
-                <IconZap size={20} />
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-[var(--accent-primary)] text-white rounded-lg shadow-sm">
+                  <IconZap size={20} />
+                </div>
+                <h1 className="text-xl font-bold tracking-tight">GiniAI</h1>
               </div>
-              <h1 className="text-xl font-bold tracking-tight">GiniAI</h1>
+              <button onClick={() => setSidebarOpen(false)} className="md:hidden p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+                <IconX size={20} />
+              </button>
             </div>
 
             <button onClick={createNewSession} className="w-full flex items-center justify-center gap-2 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-colors text-sm font-medium mb-2">
@@ -246,6 +270,7 @@ const ChatInterface = ({ roleTitle }) => {
                       setActiveSessionId(session.id); 
                       setOpenMenuId(null); 
                       setIsTemporary(false);
+                      setSidebarOpen(false); // Close on mobile
                     }}
                     className={`w-full text-left p-3 rounded-lg flex items-center gap-3 transition-colors pr-8 ${
                       activeSessionId === session.id
@@ -306,11 +331,19 @@ const ChatInterface = ({ roleTitle }) => {
         </div>
 
         {/* MAIN CONTENT */}
-        <div className="flex-1 flex flex-col relative bg-[var(--bg-primary)]">
+        <div className="flex-1 flex flex-col relative bg-[var(--bg-primary)] min-w-0">
           <header className="p-4 md:p-6 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-secondary)] sticky top-0 z-10">
-            <div>
-              <h2 className="text-xl font-semibold">{roleTitle} Workspace</h2>
-              {isTemporary && <span className="text-xs text-amber-400 font-medium">⚡ Temporary — this chat won't be saved</span>}
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setSidebarOpen(true)}
+                className="p-2 md:hidden text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
+              >
+                <IconMenu2 size={24} />
+              </button>
+              <div>
+                <h2 className="text-lg md:text-xl font-semibold truncate max-w-[150px] md:max-w-none">{roleTitle} Workspace</h2>
+                {isTemporary && <span className="text-[10px] md:text-xs text-amber-400 font-medium">⚡ Temporary</span>}
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <ThemeToggle />
