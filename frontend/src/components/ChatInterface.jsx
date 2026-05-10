@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import ThemeToggle from "../components/ThemeToggle";
@@ -18,19 +19,43 @@ const ChatInterface = ({ roleTitle }) => {
   const userEmail = sessionStorage.getItem("email") || "guest";
   const storageKey = `chat_v2_${userEmail}_${roleTitle.toLowerCase()}`;
 
-  const [sessions, setSessions] = useState(() => {
-    const saved = JSON.parse(localStorage.getItem(storageKey)) || [];
-    const isNewArrival = sessionStorage.getItem("just_logged_in") === "true";
-    
-    if (isNewArrival) {
-      sessionStorage.removeItem("just_logged_in");
-      const fresh = { id: Date.now(), title: "New Conversation", messages: [] };
-      return [fresh, ...saved];
-    }
-    return saved.length > 0 ? saved : [{ id: Date.now(), title: "New Conversation", messages: [] }];
-  });
+  const [sessions, setSessions] = useState([]);
+  const [activeSessionId, setActiveSessionId] = useState(null);
 
-  const [activeSessionId, setActiveSessionId] = useState(() => sessions[0]?.id || null);
+  useEffect(() => {
+    const fetchCloudChats = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/chats/?email=${userEmail}&role=${roleTitle.toLowerCase()}`);
+        if (res.data.length > 0) {
+          setSessions(res.data);
+          setActiveSessionId(res.data[0].id);
+        } else {
+          const fresh = { id: Date.now(), title: "New Conversation", messages: [] };
+          setSessions([fresh]);
+          setActiveSessionId(fresh.id);
+        }
+      } catch (err) {
+        console.error("Cloud fetch failed:", err);
+        const fresh = { id: Date.now(), title: "New Conversation", messages: [] };
+        setSessions([fresh]);
+        setActiveSessionId(fresh.id);
+      }
+    };
+    fetchCloudChats();
+  }, [userEmail, roleTitle]);
+
+  const saveSessionToCloud = async (session) => {
+    if (isTemporary) return;
+    try {
+      await axios.post(`${API_BASE_URL}/api/chats/save`, {
+        ...session,
+        email: userEmail,
+        role: roleTitle.toLowerCase()
+      });
+    } catch (error) {
+      console.error("Cloud save failed:", error);
+    }
+  };
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -58,6 +83,7 @@ const ChatInterface = ({ roleTitle }) => {
   }, [activeSessionId, sessions]);
 
   useEffect(() => {
+    // Local storage acts as a fast cache now
     if (sessions.length > 0) localStorage.setItem(storageKey, JSON.stringify(sessions));
   }, [sessions, storageKey]);
 
@@ -82,9 +108,14 @@ const ChatInterface = ({ roleTitle }) => {
     setActiveSessionId(newSession.id);
     setPendingFile(null);
     setIsTemporary(false);
+    saveSessionToCloud(newSession);
   };
 
-  const deleteSession = (id) => {
+  const deleteSession = async (id) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/api/chats/${id}?email=${userEmail}`);
+    } catch (err) { console.error(err); }
+
     const updated = sessions.filter(s => s.id !== id);
     if (updated.length === 0) {
       const fresh = { id: Date.now(), title: "New Conversation", messages: [] };
@@ -99,9 +130,10 @@ const ChatInterface = ({ roleTitle }) => {
 
   const pinSession = (id) => {
     setSessions(prev => {
-      const session = prev.find(s => s.id === id);
-      const others = prev.filter(s => s.id !== id);
-      return [{ ...session, pinned: !session.pinned }, ...others];
+      const updated = prev.map(s => s.id === id ? { ...s, pinned: !s.pinned } : s);
+      const session = updated.find(s => s.id === id);
+      saveSessionToCloud(session);
+      return updated;
     });
     setOpenMenuId(null);
   };
@@ -186,11 +218,19 @@ const ChatInterface = ({ roleTitle }) => {
         if (done) break;
         accumulatedResponse += decoder.decode(value, { stream: true });
         setChatHistory(prev => { const h = [...prev]; h[h.length - 1] = { ...h[h.length - 1], content: accumulatedResponse }; return h; });
-        setSessions(prev => prev.map(s => s.id === activeSessionId ? {
-          ...s,
-          messages: [...updatedHistory, { ...botPlaceholder, content: accumulatedResponse }],
-          title: s.messages.length === 0 ? userContent.substring(0, 30) + "..." : s.title
-        } : s));
+        setSessions(prev => {
+          const updated = prev.map(s => s.id === activeSessionId ? {
+            ...s,
+            messages: [...updatedHistory, { ...botPlaceholder, content: accumulatedResponse }],
+            title: s.messages.length === 0 ? userContent.substring(0, 30) + "..." : s.title
+          } : s);
+          // Save only when done for efficiency, but here we can save once title is generated
+          if (done) {
+             const session = updated.find(s => s.id === activeSessionId);
+             saveSessionToCloud(session);
+          }
+          return updated;
+        });
       }
     } catch (error) {
       console.error("Stream error:", error);

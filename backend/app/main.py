@@ -11,6 +11,7 @@ from app.api.ai import router as ai_router
 from app.api.auth import router as auth_router
 from app.api.stats import router as stats_router
 from app.api.files import router as files_router
+from app.api.chats import router as chats_router
 
 app = FastAPI()
 
@@ -45,6 +46,7 @@ app.include_router(auth_router)
 app.include_router(ai_router)
 app.include_router(files_router, prefix="/api/files")
 app.include_router(stats_router, prefix="/api/stats")
+app.include_router(chats_router, prefix="/api/chats")
 
 
 @app.get("/")
