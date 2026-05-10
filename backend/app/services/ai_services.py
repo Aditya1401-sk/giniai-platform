@@ -1,24 +1,53 @@
-import google.generativeai as genai
 import os
+import requests
+import json
 from dotenv import load_dotenv
 
-# VERSION 2.0 - DIRECT GEMINI INTEGRATION
-print("Initializing GiniAI Service v2.0 (Direct Gemini)")
+# VERSION 3.0 - STABLE OPENROUTER (FREE TIER)
+print("Initializing GiniAI Service v3.0 (OpenRouter Free Tier)")
 
 load_dotenv()
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=GEMINI_API_KEY)
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 def get_ai_response_stream(prompt: str):
-    print(f"Generating stream for prompt: {prompt[:50]}...")
-    model = genai.GenerativeModel('gemini-flash-latest')
+    print(f"Generating stream via OpenRouter for: {prompt[:50]}...")
     
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    # Using openrouter/free to automatically select the best available free model
+    payload = {
+        "model": "openrouter/free", 
+        "messages": [
+            {"role": "user", "content": prompt}
+        ],
+        "stream": True
+    }
+
     try:
-        response = model.generate_content(prompt, stream=True)
-        for chunk in response:
-            if chunk.text:
-                yield chunk.text
+        response = requests.post(url, headers=headers, data=json.dumps(payload), stream=True)
+        response.raise_for_status()
+        
+        for line in response.iter_lines():
+            if line:
+                line_text = line.decode('utf-8')
+                if line_text.startswith("data: "):
+                    data_str = line_text[6:]
+                    if data_str == "[DONE]":
+                        break
+                    try:
+                        data = json.loads(data_str)
+                        if "choices" in data and len(data["choices"]) > 0:
+                            content = data["choices"][0].get("delta", {}).get("content", "")
+                            if content:
+                                yield content
+                    except json.JSONDecodeError:
+                        continue
+                        
     except Exception as e:
-        print(f"GEMINI ERROR: {str(e)}")
+        print(f"OPENROUTER ERROR: {str(e)}")
         yield f"AI Service Error: {str(e)}"
