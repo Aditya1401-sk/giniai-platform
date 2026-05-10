@@ -71,20 +71,12 @@ async def google_login(data: dict):
         user = users_collection.find_one({"email": email})
         
         if not user:
-            # Create new user if they don't exist
-            # Default role: management (can be adjusted)
-            role = "management"
-            custom_id = generate_custom_id(role)
-            new_user = {
-                "name": name,
-                "email": email,
-                "password": hash_password("google-oauth-user"), # Placeholder
-                "role": role,
-                "custom_id": custom_id
-            }
-            users_collection.insert_one(new_user)
-            user = new_user
-            add_log(f"New user created via Google: {email}", "sys")
+            # Block unauthorized access
+            add_log(f"Unauthorized Google login attempt: {email}", "auth")
+            raise HTTPException(
+                status_code=403, 
+                detail="Access Denied: Your email is not registered. Please contact your administrator."
+            )
         
         access_token = create_access_token(data={"sub": email})
         add_log(f"Google login: {email}", "auth")
