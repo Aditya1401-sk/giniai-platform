@@ -12,7 +12,7 @@ genai.configure(api_key=GEMINI_API_KEY)
 
 def get_ai_response_stream(prompt: str):
     print(f"Generating stream for prompt: {prompt[:50]}...")
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-flash-latest')
     
     try:
         response = model.generate_content(prompt, stream=True)
