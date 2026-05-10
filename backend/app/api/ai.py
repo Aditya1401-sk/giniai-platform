@@ -14,8 +14,8 @@ def chat(request: AIRequest):
     msg = request.message.lower()
     user_role = getattr(request, 'role', 'guest') 
     
-    # Log the request
-    add_log(f"AI Request from {user_role}: {request.message[:30]}...", "ai")
+    # Log the request (Full message)
+    add_log(f"AI Request from {user_role}: {request.message}", "ai")
     
     # 1. Check if the user is actually asking for platform data (Admin Only)
     data_keywords = ["user", "how many", "status", "total", "count", "stat"]
