@@ -70,6 +70,14 @@ const ChatInterface = ({ roleTitle }) => {
   const [showProfile, setShowProfile] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const chatEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -262,7 +270,7 @@ const ChatInterface = ({ roleTitle }) => {
         {/* SIDEBAR */}
         <motion.div 
           initial={false}
-          animate={{ x: sidebarOpen ? 0 : -280 }}
+          animate={{ x: isMobile ? (sidebarOpen ? 0 : -280) : 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
           className={`fixed md:relative w-[280px] h-full bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col z-40 md:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:flex"}`}
         >
