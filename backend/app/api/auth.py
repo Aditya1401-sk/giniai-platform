@@ -142,6 +142,11 @@ def update_user(email: str, user_update: UserUpdate):
     update_data = {}
     if user_update.name:
         update_data["name"] = user_update.name
+    if user_update.email and user_update.email != email:
+        # Check if new email is already taken
+        if users_collection.find_one({"email": user_update.email}):
+            raise HTTPException(status_code=400, detail="New email already taken")
+        update_data["email"] = user_update.email
     if user_update.password:
         update_data["password"] = hash_password(user_update.password)
     if user_update.role:
@@ -149,7 +154,7 @@ def update_user(email: str, user_update: UserUpdate):
     
     if update_data:
         users_collection.update_one({"email": email}, {"$set": update_data})
-        add_log(f"User updated: {email}", "sys")
+        add_log(f"User updated: {email} -> {user_update.email if user_update.email else email}", "sys")
     
     return {"message": "User updated successfully"}
 

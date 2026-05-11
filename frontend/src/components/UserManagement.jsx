@@ -60,6 +60,7 @@ const UserManagement = ({ onUserUpdate }) => {
     try {
       await axios.put(`${API_BASE_URL}/auth/users/${editingUser.email}`, {
         name: formData.name,
+        email: formData.email,
         password: formData.password || undefined,
         role: formData.role,
       });
@@ -247,7 +248,6 @@ const UserManagement = ({ onUserUpdate }) => {
                       type="email"
                       placeholder="email@company.com"
                       required
-                      disabled={!!editingUser}
                       className="w-full bg-[var(--bg-input)] border border-[var(--border-color)] rounded-lg py-2.5 pl-10 pr-4 text-[var(--text-primary)] focus:border-[var(--accent-primary)] text-sm transition-colors disabled:opacity-50"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}

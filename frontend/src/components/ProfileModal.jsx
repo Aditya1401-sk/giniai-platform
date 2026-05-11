@@ -13,6 +13,23 @@ export default function ProfileModal({ onClose }) {
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef(null);
 
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/auth/users`);
+      const user = response.data.find(u => u.email === email);
+      if (user) {
+        setDisplayName(user.name || defaultName);
+        setUsername(user.name || defaultName);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -39,9 +56,17 @@ export default function ProfileModal({ onClose }) {
     }
   };
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => { setSaved(false); onClose(); }, 1200);
+  const handleSave = async () => {
+    try {
+      await axios.put(`${API_BASE_URL}/auth/users/${email}`, {
+        name: displayName
+      });
+      setSaved(true);
+      setTimeout(() => { setSaved(false); onClose(); }, 1200);
+    } catch (error) {
+      console.error("Save failed", error);
+      alert("Failed to save changes");
+    }
   };
 
   const initials = displayName

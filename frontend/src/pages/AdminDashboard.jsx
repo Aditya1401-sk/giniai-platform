@@ -24,9 +24,9 @@ import {
 
 function AdminDashboard() {
   const [stats, setStats] = useState({
-    totalUsers: 0,
     aiRequests: 0,
     status: "Active",
+    name: "Admin"
   });
 
   const [logs, setLogs] = useState([]);
@@ -54,11 +54,14 @@ function AdminDashboard() {
 
   const fetchStatsAndLogs = async () => {
     try {
-      const [statsRes, logsRes] = await Promise.all([
+      const [statsRes, logsRes, usersRes] = await Promise.all([
         axios.get(`${API_BASE_URL}/api/stats/stats`),
-        axios.get(`${API_BASE_URL}/api/stats/logs`)
+        axios.get(`${API_BASE_URL}/api/stats/logs`),
+        axios.get(`${API_BASE_URL}/auth/users`)
       ]);
-      setStats(statsRes.data);
+      const email = sessionStorage.getItem("email");
+      const currentUser = usersRes.data.find(u => u.email === email);
+      setStats({ ...statsRes.data, name: currentUser?.name || email?.split('@')[0] || "Admin" });
       setLogs(logsRes.data);
     } catch (error) {
       console.error("Error fetching live data:", error);
@@ -262,9 +265,9 @@ function AdminDashboard() {
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="solid-card p-10 max-w-2xl mx-auto">
              <div className="flex flex-col items-center text-center">
                 <div className="w-24 h-24 rounded-full bg-[var(--accent-primary)] flex items-center justify-center text-white text-3xl font-bold mb-6 shadow-xl">
-                  {sessionStorage.getItem("email")?.[0]?.toUpperCase()}
+                  {stats.name?.[0]?.toUpperCase()}
                 </div>
-                <h2 className="text-2xl font-bold mb-2">{sessionStorage.getItem("email")?.split('@')[0]}</h2>
+                <h2 className="text-2xl font-bold mb-2">{stats.name}</h2>
                 <p className="text-[var(--text-secondary)] mb-6">{sessionStorage.getItem("email")}</p>
                 <div className="px-4 py-1.5 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] rounded-full text-xs font-bold uppercase tracking-widest border border-[var(--accent-primary)]/20">
                    Role: Administrator
