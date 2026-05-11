@@ -35,6 +35,24 @@ async def get_logs():
         log["time"] = ts_ist.strftime("%I:%M %p")
     return logs
 
+@router.get("/logs/all")
+async def get_all_logs():
+    # Fetch all logs, newest first
+    logs = list(logs_collection.find().sort("timestamp", -1))
+    ist = timezone(timedelta(hours=5, minutes=30))
+    for log in logs:
+        log["_id"] = str(log["_id"])
+        ts = log["timestamp"]
+        if ts.tzinfo is None: ts = ts.replace(tzinfo=timezone.utc)
+        ts_ist = ts.astimezone(ist)
+        log["time"] = ts_ist.strftime("%d %b, %I:%M %p")
+    return logs
+
+@router.delete("/logs/clear")
+async def clear_logs():
+    logs_collection.delete_many({})
+    return {"message": "Logs cleared successfully"}
+
 def add_log(event: str, log_type: str = "sys", user_email: str = "unknown"):
     # Use Indian Standard Time (UTC+5:30)
     ist = timezone(timedelta(hours=5, minutes=30))

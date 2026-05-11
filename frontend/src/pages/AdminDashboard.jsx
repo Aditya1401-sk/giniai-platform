@@ -19,7 +19,8 @@ import {
   IconGlobe, 
   IconCpu,
   IconTrash2,
-  IconUser
+  IconUser,
+  IconHistory
 } from "../components/Icons";
 
 function AdminDashboard() {
@@ -30,13 +31,14 @@ function AdminDashboard() {
   });
 
   const [logs, setLogs] = useState([]);
+  const [allLogs, setAllLogs] = useState([]);
   const [chatOpen, setChatOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([
     { role: "bot", content: "Hello Admin! I am the GiniLytics AI. How can I assist you with platform monitoring today?" }
   ]);
   const [isTyping, setIsTyping] = useState(false);
-  const [activeTab, setActiveTab] = useState("analytics"); // analytics, users, profile
+  const [activeTab, setActiveTab] = useState("analytics"); // analytics, users, profile, history
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -54,17 +56,30 @@ function AdminDashboard() {
 
   const fetchStatsAndLogs = async () => {
     try {
-      const [statsRes, logsRes, usersRes] = await Promise.all([
+      const [statsRes, logsRes, usersRes, allLogsRes] = await Promise.all([
         axios.get(`${API_BASE_URL}/api/stats/stats`),
         axios.get(`${API_BASE_URL}/api/stats/logs`),
-        axios.get(`${API_BASE_URL}/auth/users`)
+        axios.get(`${API_BASE_URL}/auth/users`),
+        axios.get(`${API_BASE_URL}/api/stats/logs/all`)
       ]);
       const email = sessionStorage.getItem("email");
       const currentUser = usersRes.data.find(u => u.email === email);
       setStats({ ...statsRes.data, name: currentUser?.name || email?.split('@')[0] || "Admin" });
       setLogs(logsRes.data);
+      setAllLogs(allLogsRes.data);
     } catch (error) {
       console.error("Error fetching live data:", error);
+    }
+  };
+
+  const handleClearLogs = async () => {
+    if (window.confirm("⚠️ This will permanently delete all activity history. This action cannot be undone. Are you sure?")) {
+      try {
+        await axios.delete(`${API_BASE_URL}/api/stats/logs/clear`);
+        fetchStatsAndLogs();
+      } catch (error) {
+        alert("Error clearing logs");
+      }
     }
   };
 
@@ -182,6 +197,12 @@ function AdminDashboard() {
           >
             <IconUser size={16} /> Profile
           </button>
+          <button 
+            onClick={() => setActiveTab("history")}
+            className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === 'history' ? 'bg-[var(--accent-primary)] text-white shadow-lg' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]'}`}
+          >
+            <IconHistory size={16} /> History
+          </button>
         </div>
 
         {activeTab === "analytics" && (
@@ -284,6 +305,56 @@ function AdminDashboard() {
                    <p className="text-sm font-semibold text-emerald-500">Tier 1 (Root)</p>
                 </div>
              </div>
+          </motion.div>
+        {activeTab === "history" && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+               <div>
+                  <h2 className="text-xl font-bold">System Audit Logs</h2>
+                  <p className="text-sm text-[var(--text-secondary)]">Complete history of platform activity</p>
+               </div>
+               <button 
+                 onClick={handleClearLogs}
+                 className="px-4 py-2 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-red-500 hover:text-white transition-all flex items-center gap-2"
+               >
+                 <IconTrash2 size={14} /> Reset All Logs
+               </button>
+            </div>
+
+            <div className="solid-card overflow-hidden">
+               <div className="max-h-[600px] overflow-y-auto custom-scrollbar">
+                  <table className="w-full text-left border-collapse">
+                     <thead className="sticky top-0 bg-[var(--bg-secondary)] z-10">
+                        <tr className="border-b border-[var(--border-color)]">
+                           <th className="p-4 text-[10px] uppercase font-bold text-[var(--text-secondary)]">Time</th>
+                           <th className="p-4 text-[10px] uppercase font-bold text-[var(--text-secondary)]">Type</th>
+                           <th className="p-4 text-[10px] uppercase font-bold text-[var(--text-secondary)]">User</th>
+                           <th className="p-4 text-[10px] uppercase font-bold text-[var(--text-secondary)]">Event</th>
+                        </tr>
+                     </thead>
+                     <tbody className="divide-y divide-[var(--border-color)]">
+                        {allLogs.length === 0 ? (
+                           <tr>
+                              <td colSpan="4" className="p-10 text-center text-[var(--text-secondary)]">No logs available.</td>
+                           </tr>
+                        ) : (
+                           allLogs.map((log) => (
+                              <tr key={log._id} className="hover:bg-[var(--bg-tertiary)]/50 transition-colors">
+                                 <td className="p-4 text-xs font-mono text-[var(--text-secondary)]">{log.time}</td>
+                                 <td className="p-4">
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${log.type === 'ai' ? 'bg-cyan-500/10 text-cyan-500' : log.type === 'auth' ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]' : 'bg-gray-500/10 text-gray-500'}`}>
+                                       {log.type}
+                                    </span>
+                                 </td>
+                                 <td className="p-4 text-xs font-semibold">{log.user_email}</td>
+                                 <td className="p-4 text-xs text-[var(--text-primary)]">{log.event}</td>
+                              </tr>
+                           ))
+                        )}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
           </motion.div>
         )}
       </div>
