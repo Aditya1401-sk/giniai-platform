@@ -83,6 +83,15 @@ function AdminDashboard() {
     }
   };
 
+  const handleDeleteLog = async (id) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/api/stats/logs/${id}`);
+      fetchStatsAndLogs();
+    } catch (error) {
+      alert("Error deleting log entry");
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
@@ -331,24 +340,34 @@ function AdminDashboard() {
                            <th className="p-4 text-[10px] uppercase font-bold text-[var(--text-secondary)]">Type</th>
                            <th className="p-4 text-[10px] uppercase font-bold text-[var(--text-secondary)]">User</th>
                            <th className="p-4 text-[10px] uppercase font-bold text-[var(--text-secondary)]">Event</th>
+                           <th className="p-4 text-[10px] uppercase font-bold text-[var(--text-secondary)] text-right">Actions</th>
                         </tr>
                      </thead>
                      <tbody className="divide-y divide-[var(--border-color)]">
                         {allLogs.length === 0 ? (
                            <tr>
-                              <td colSpan="4" className="p-10 text-center text-[var(--text-secondary)]">No logs available.</td>
+                              <td colSpan="5" className="p-10 text-center text-[var(--text-secondary)]">No logs available.</td>
                            </tr>
                         ) : (
                            allLogs.map((log) => (
                               <tr key={log._id} className="hover:bg-[var(--bg-tertiary)]/50 transition-colors">
-                                 <td className="p-4 text-xs font-mono text-[var(--text-secondary)]">{log.time}</td>
+                                 <td className="p-4 text-xs font-mono text-[var(--text-secondary)] whitespace-nowrap">{log.time}</td>
                                  <td className="p-4">
                                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${log.type === 'ai' ? 'bg-cyan-500/10 text-cyan-500' : log.type === 'auth' ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]' : 'bg-gray-500/10 text-gray-500'}`}>
                                        {log.type}
                                     </span>
                                  </td>
-                                 <td className="p-4 text-xs font-semibold">{log.user_email}</td>
-                                 <td className="p-4 text-xs text-[var(--text-primary)]">{log.event}</td>
+                                 <td className="p-4 text-xs font-semibold whitespace-nowrap">{log.user_email}</td>
+                                 <td className="p-4 text-xs text-[var(--text-primary)] leading-relaxed min-w-[300px] break-words">{log.event}</td>
+                                 <td className="p-4 text-right">
+                                    <button 
+                                      onClick={() => handleDeleteLog(log._id)}
+                                      className="p-1.5 text-[var(--text-secondary)] hover:text-red-500 transition-colors"
+                                      title="Delete specific entry"
+                                    >
+                                      <IconTrash2 size={14} />
+                                    </button>
+                                 </td>
                               </tr>
                            ))
                         )}

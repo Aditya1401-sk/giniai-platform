@@ -53,6 +53,17 @@ async def clear_logs():
     logs_collection.delete_many({})
     return {"message": "Logs cleared successfully"}
 
+@router.delete("/logs/{log_id}")
+async def delete_log_entry(log_id: str):
+    from bson import ObjectId
+    try:
+        result = logs_collection.delete_one({"_id": ObjectId(log_id)})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Log not found")
+        return {"message": "Log deleted successfully"}
+    except:
+        raise HTTPException(status_code=400, detail="Invalid Log ID")
+
 def add_log(event: str, log_type: str = "sys", user_email: str = "unknown"):
     # Use Indian Standard Time (UTC+5:30)
     ist = timezone(timedelta(hours=5, minutes=30))
