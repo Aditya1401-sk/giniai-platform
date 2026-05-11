@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconPlus, IconEdit, IconTrash2, IconX, IconUser, IconShield, IconMail, IconBadgeCheck, IconFingerprint, IconHash } from "../components/Icons";
+import { IconPlus, IconEdit, IconTrash2, IconX, IconUser, IconShield, IconMail, IconBadgeCheck, IconFingerprint, IconHash, IconEye, IconEyeOff } from "../components/Icons";
 import { API_BASE_URL } from "../config";
 
 const UserManagement = ({ onUserUpdate }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -289,13 +290,20 @@ const UserManagement = ({ onUserUpdate }) => {
                   <div className="relative">
                     <IconFingerprint className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" size={16} />
                     <input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       required={!editingUser}
-                      className="w-full bg-[var(--bg-input)] border border-[var(--border-color)] rounded-lg py-2.5 pl-10 pr-4 text-[var(--text-primary)] focus:border-[var(--accent-primary)] text-sm transition-colors"
+                      className="w-full bg-[var(--bg-input)] border border-[var(--border-color)] rounded-lg py-2.5 pl-10 pr-10 text-[var(--text-primary)] focus:border-[var(--accent-primary)] text-sm transition-colors"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors"
+                    >
+                      {showPassword ? <IconEyeOff size={16} /> : <IconEye size={16} />}
+                    </button>
                   </div>
                 </div>
 

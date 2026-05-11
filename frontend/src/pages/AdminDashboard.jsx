@@ -62,7 +62,7 @@ function AdminDashboard() {
         axios.get(`${API_BASE_URL}/auth/users`),
         axios.get(`${API_BASE_URL}/api/stats/logs/all`)
       ]);
-      const email = sessionStorage.getItem("email");
+      const email = localStorage.getItem("email");
       const currentUser = usersRes.data.find(u => u.email === email);
       setStats({ ...statsRes.data, name: currentUser?.name || email?.split('@')[0] || "Admin" });
       setLogs(logsRes.data);
@@ -107,7 +107,10 @@ function AdminDashboard() {
     e.preventDefault();
     if (!message.trim()) return;
 
-    const userEmail = sessionStorage.getItem("email") || "admin";
+    const userEmail = localStorage.getItem("email") || "admin";
+    const userRole = localStorage.getItem("role") || "admin";
+    const userName = localStorage.getItem("name") || "Admin";
+    const profilePic = localStorage.getItem("profile_pic") || "";
     const userMsg = { role: "user", content: message };
     const botPlaceholder = { role: "bot", content: "" };
     setChatHistory(prev => [...prev, userMsg, botPlaceholder]);

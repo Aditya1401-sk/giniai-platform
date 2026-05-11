@@ -10,13 +10,13 @@ import axios from "axios";
 import { API_BASE_URL } from "./config";
 
 function App() {
-  const email = sessionStorage.getItem("email");
+  const email = localStorage.getItem("email");
 
   useEffect(() => {
     if (!email) return;
 
     const pulse = () => {
-      const currentEmail = sessionStorage.getItem("email");
+      const currentEmail = localStorage.getItem("email");
       if (!currentEmail) return;
       axios.post(`${API_BASE_URL}/auth/pulse`, { email: currentEmail }).catch(() => {});
     };

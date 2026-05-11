@@ -16,7 +16,7 @@ import {
 import { API_BASE_URL } from "../config";
 
 const ChatInterface = ({ roleTitle }) => {
-  const userEmail = sessionStorage.getItem("email") || "guest";
+  const userEmail = localStorage.getItem("email") || "guest";
   const storageKey = `chat_v2_${userEmail}_${roleTitle.toLowerCase()}`;
 
   const [sessions, setSessions] = useState([]);
@@ -111,12 +111,12 @@ const ChatInterface = ({ roleTitle }) => {
 
   const handleLogout = async () => {
     try {
-      const email = sessionStorage.getItem("email");
+      const email = localStorage.getItem("email");
       if (email) await axios.post(`${API_BASE_URL}/auth/offline`, { email });
     } catch (e) {}
     localStorage.removeItem("token");
     localStorage.removeItem("role");
-    sessionStorage.removeItem("email");
+    localStorage.removeItem("email");
     // Clear all session visited flags to ensure fresh chat on next login
     Object.keys(sessionStorage).forEach(key => {
       if (key.startsWith('visited_')) sessionStorage.removeItem(key);

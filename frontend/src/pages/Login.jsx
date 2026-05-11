@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { GoogleLogin } from "@react-oauth/google";
-import { IconMail, IconLock, IconLogIn, IconShield, IconSparkles, IconZap } from "../components/Icons";
+import { IconMail, IconLock, IconLogIn, IconShield, IconSparkles, IconZap, IconEye, IconEyeOff } from "../components/Icons";
 import ThemeToggle from "../components/ThemeToggle";
 import { API_BASE_URL } from "../config";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showWakeUpMessage, setShowWakeUpMessage] = useState(false);
 
@@ -29,8 +30,9 @@ export default function Login() {
       const role = response.data.role.toLowerCase();
       localStorage.setItem("token", response.data.access_token);
       localStorage.setItem("role", role);
-      sessionStorage.setItem("email", email);
-      sessionStorage.setItem("profile_pic", response.data.profile_pic || "");
+      localStorage.setItem("email", email);
+      localStorage.setItem("name", response.data.name || "User");
+      localStorage.setItem("profile_pic", response.data.profile_pic || "");
       sessionStorage.setItem("just_logged_in", "true");
       
       if (role === "admin") {
@@ -60,8 +62,9 @@ export default function Login() {
       const role = response.data.role.toLowerCase();
       localStorage.setItem("token", response.data.access_token);
       localStorage.setItem("role", role);
-      sessionStorage.setItem("email", response.data.email || "google-user"); 
-      sessionStorage.setItem("profile_pic", response.data.profile_pic || "");
+      localStorage.setItem("email", response.data.email || "google-user"); 
+      localStorage.setItem("name", response.data.name || "User");
+      localStorage.setItem("profile_pic", response.data.profile_pic || "");
       sessionStorage.setItem("just_logged_in", "true");
 
       window.location.href = `/${role}`;
@@ -117,13 +120,20 @@ export default function Login() {
             <div className="relative group">
               <IconLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] group-focus-within:text-[var(--accent-primary)] transition-colors" size={18} />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Security Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-[var(--bg-input)] border border-[var(--border-color)] rounded-lg py-3 pl-12 pr-4 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-primary)] transition-all placeholder-[var(--text-secondary)] text-sm"
+                className="w-full bg-[var(--bg-input)] border border-[var(--border-color)] rounded-lg py-3 pl-12 pr-12 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-primary)] transition-all placeholder-[var(--text-secondary)] text-sm"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors"
+              >
+                {showPassword ? <IconEyeOff size={18} /> : <IconEye size={18} />}
+              </button>
             </div>
           </div>
 
