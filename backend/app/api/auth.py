@@ -9,6 +9,7 @@ from app.api.stats import add_log
 from typing import List
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
+from datetime import datetime, timedelta, timezone
 
 import os
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
@@ -96,7 +97,32 @@ async def google_login(data: dict):
 @router.get("/users", response_model=List[UserResponse])
 def get_users():
     users = list(users_collection.find({}, {"_id": 0, "password": 0}))
+    ist = timezone(timedelta(hours=5, minutes=30))
+    now = datetime.now(ist)
+    
+    for user in users:
+        last_active_str = user.get("last_active")
+        if last_active_str:
+            try:
+                last_active = datetime.fromisoformat(last_active_str)
+                # If active in last 5 minutes, mark as online
+                if now - last_active < timedelta(minutes=5):
+                    user["is_online"] = True
+            except:
+                user["is_online"] = False
+        else:
+            user["is_online"] = False
+            
     return users
+
+@router.post("/pulse")
+def pulse(data: dict):
+    email = data.get("email")
+    if not email: return {"status": "error"}
+    ist = timezone(timedelta(hours=5, minutes=30))
+    now = datetime.now(ist).isoformat()
+    users_collection.update_one({"email": email}, {"$set": {"last_active": now}})
+    return {"status": "pulsing"}
     
 @router.post("/upload-profile-pic")
 async def upload_profile_pic(email: str, file: UploadFile = File(...)):

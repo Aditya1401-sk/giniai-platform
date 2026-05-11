@@ -6,6 +6,7 @@ from app.db.database import users_collection
 from app.api.stats import add_log
 from rag_service.rag_core import rag_engine
 import json
+from datetime import datetime, timedelta, timezone
 
 router = APIRouter()
 
@@ -40,9 +41,24 @@ async def chat(request: AIRequest):
 
     # 4. Construct Final Prompt
     if is_asking_for_data and user_role == "admin":
-        user_count = users_collection.count_documents({})
+        users = list(users_collection.find({}, {"password": 0}))
+        ist = timezone(timedelta(hours=5, minutes=30))
+        now = datetime.now(ist)
+        online_users = []
+        for u in users:
+            last_active_str = u.get("last_active")
+            if last_active_str:
+                try:
+                    last_active = datetime.fromisoformat(last_active_str)
+                    if now - last_active < timedelta(minutes=5):
+                        online_users.append(f"{u['name']} ({u['role']})")
+                except: pass
+        
+        online_context = ", ".join(online_users) if online_users else "None"
+        user_count = len(users)
+        
         prompt = (
-            f"Context: Total Users = {user_count}, Status = Active.\n"
+            f"System Context: Total Registered Users = {user_count}. Users Currently LIVE/Online = {online_context}.\n"
             f"Relevant Docs: {context_text}\n"
             f"{history_text}"
             f"User: {request.message}\n"

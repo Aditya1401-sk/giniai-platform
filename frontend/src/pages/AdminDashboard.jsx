@@ -155,9 +155,9 @@ function AdminDashboard() {
   };
 
   const statCards = [
-    { title: "Network Nodes", value: stats.totalUsers, icon: IconGlobe, colorClass: "text-blue-500", bgClass: "bg-blue-500/10" },
-    { title: "Neural Compute", value: stats.aiRequests, icon: IconCpu, colorClass: "text-cyan-500", bgClass: "bg-cyan-500/10" },
-    { title: "System Core", value: stats.status, icon: IconZap, colorClass: "text-emerald-500", bgClass: "bg-emerald-500/10" },
+    { title: "Live Presence", value: stats.liveUsers || 0, icon: IconGlobe, colorClass: "text-blue-500", bgClass: "bg-blue-500/10" },
+    { title: "Total Users", value: stats.totalUsers || 0, icon: IconShieldCheck, colorClass: "text-[var(--accent-primary)]", bgClass: "bg-[var(--accent-primary)]/10" },
+    { title: "Neural Compute", value: stats.aiRequests || 0, icon: IconCpu, colorClass: "text-cyan-500", bgClass: "bg-cyan-500/10" },
   ];
 
   return (

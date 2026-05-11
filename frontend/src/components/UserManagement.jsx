@@ -152,7 +152,18 @@ const UserManagement = ({ onUserUpdate }) => {
                         <IconUser size={18} />
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <span className="font-semibold text-[var(--text-primary)] truncate">{user.name || "Unnamed"}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-[var(--text-primary)] truncate">{user.name || "Unnamed"}</span>
+                          {user.is_online ? (
+                            <span className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 text-[8px] font-bold uppercase rounded-full border border-emerald-500/20">
+                              <span className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></span> Online
+                            </span>
+                          ) : (
+                            <span className="px-1.5 py-0.5 bg-gray-500/10 text-gray-400 text-[8px] font-bold uppercase rounded-full border border-gray-500/10">
+                              Offline
+                            </span>
+                          )}
+                        </div>
                         <span className="text-sm text-[var(--text-secondary)] truncate">{user.email}</span>
                       </div>
                     </div>

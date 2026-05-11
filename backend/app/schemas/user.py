@@ -32,3 +32,5 @@ class UserResponse(BaseModel):
     email: str
     role: str
     custom_id: Optional[str] = None
+    last_active: Optional[str] = None
+    is_online: Optional[bool] = False

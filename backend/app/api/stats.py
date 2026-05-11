@@ -13,9 +13,15 @@ async def get_stats():
     # We count AI requests from the logs collection
     ai_requests = logs_collection.count_documents({"type": "ai"})
     
+    # Count Live Users (active in last 5 mins)
+    ist = timezone(timedelta(hours=5, minutes=30))
+    five_mins_ago = (datetime.now(ist) - timedelta(minutes=5)).isoformat()
+    live_users = users_collection.count_documents({"last_active": {"$gte": five_mins_ago}})
+    
     return {
         "totalUsers": total_users,
         "aiRequests": ai_requests,
+        "liveUsers": live_users,
         "status": "Active"
     }
 
