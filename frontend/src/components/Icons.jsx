@@ -291,3 +291,11 @@ export const IconShare = createIcon(
     <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
   </>
 );
+
+export const IconMenu2 = createIcon(
+  <>
+    <line x1="4" y1="12" x2="20" y2="12" />
+    <line x1="4" y1="6" x2="20" y2="6" />
+    <line x1="4" y1="18" x2="20" y2="18" />
+  </>
+);

@@ -368,7 +368,7 @@ const ChatInterface = ({ roleTitle }) => {
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* MAIN CONTENT */}
         <div className="flex-1 flex flex-col relative bg-[var(--bg-primary)] min-w-0">
