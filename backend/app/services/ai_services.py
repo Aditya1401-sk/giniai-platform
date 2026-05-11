@@ -19,9 +19,9 @@ def get_ai_response_stream(prompt: str):
         "Content-Type": "application/json"
     }
     
-    # Using Gemini 1.5 Flash for better performance and date awareness
+    # Using openrouter/free to ensure stability
     payload = {
-        "model": "google/gemini-flash-1.5-exp:free", 
+        "model": "openrouter/free", 
         "messages": [
             {
                 "role": "system", 
