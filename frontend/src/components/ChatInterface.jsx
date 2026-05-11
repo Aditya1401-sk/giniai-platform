@@ -26,13 +26,23 @@ const ChatInterface = ({ roleTitle }) => {
     const fetchCloudChats = async () => {
       try {
         const res = await axios.get(`${API_BASE_URL}/api/chats/?email=${userEmail}&role=${roleTitle.toLowerCase()}`);
-        if (res.data.length > 0) {
-          setSessions(res.data);
-          setActiveSessionId(res.data[0].id);
-        } else {
-          const fresh = { id: Date.now(), title: "New Conversation", messages: [] };
-          setSessions([fresh]);
+        const fresh = { id: Date.now(), title: "New Conversation", messages: [] };
+        
+        // Always add a fresh 'New Conversation' at the top on initial login/visit
+        const visitedKey = `visited_${userEmail}_${roleTitle.toLowerCase()}`;
+        if (!sessionStorage.getItem(visitedKey)) {
+          setSessions([fresh, ...res.data]);
           setActiveSessionId(fresh.id);
+          sessionStorage.setItem(visitedKey, "true");
+        } else {
+          // If already visited this session, just load history or fresh if empty
+          if (res.data.length > 0) {
+            setSessions(res.data);
+            if (!activeSessionId) setActiveSessionId(res.data[0].id);
+          } else {
+            setSessions([fresh]);
+            setActiveSessionId(fresh.id);
+          }
         }
       } catch (err) {
         console.error("Cloud fetch failed:", err);
