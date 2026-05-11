@@ -306,6 +306,7 @@ function AdminDashboard() {
                 </div>
              </div>
           </motion.div>
+        )}
         {activeTab === "history" && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
             <div className="flex justify-between items-center mb-6">
