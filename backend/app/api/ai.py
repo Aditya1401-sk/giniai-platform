@@ -19,7 +19,7 @@ async def chat(request: AIRequest):
     add_log(f"AI Request from {user_role}: {request.message}", "ai", user_email=request.email)
     
     # 1. Check if the user is actually asking for platform data (Admin Only)
-    data_keywords = ["user", "how many", "status", "total", "count", "stat"]
+    data_keywords = ["user", "how many", "status", "total", "count", "stat", "online", "logged", "live", "who is"]
     is_asking_for_data = any(key in msg for key in data_keywords)
 
     if is_asking_for_data and user_role != "admin":
@@ -58,7 +58,9 @@ async def chat(request: AIRequest):
         user_count = len(users)
         
         prompt = (
-            f"System Context: Total Registered Users = {user_count}. Users Currently LIVE/Online = {online_context}.\n"
+            f"System Context: You are the GiniAI Master Controller. You have DIRECT ACCESS to platform real-time data.\n"
+            f"Current Stats: Total Registered Users = {user_count}. Users Currently ONLINE = {online_context}.\n"
+            f"Instructions: If the user asks who is online or about system stats, use the 'Current Stats' above to answer directly. Do NOT say you don't have access to real-time data.\n"
             f"Relevant Docs: {context_text}\n"
             f"{history_text}"
             f"User: {request.message}\n"
