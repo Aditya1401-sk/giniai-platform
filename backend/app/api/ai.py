@@ -10,7 +10,7 @@ import json
 router = APIRouter()
 
 @router.post("/chat")
-def chat(request: AIRequest):
+async def chat(request: AIRequest):
     msg = request.message.lower()
     user_role = getattr(request, 'role', 'guest') 
     
