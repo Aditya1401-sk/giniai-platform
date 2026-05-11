@@ -123,6 +123,16 @@ def pulse(data: dict):
     now = datetime.now(ist).isoformat()
     users_collection.update_one({"email": email}, {"$set": {"last_active": now}})
     return {"status": "pulsing"}
+
+@router.post("/offline")
+def set_offline(data: dict):
+    email = data.get("email")
+    if not email: return {"status": "error"}
+    # Set last_active to long ago to force offline status
+    ist = timezone(timedelta(hours=5, minutes=30))
+    long_ago = (datetime.now(ist) - timedelta(days=1)).isoformat()
+    users_collection.update_one({"email": email}, {"$set": {"last_active": long_ago}})
+    return {"status": "offline"}
     
 @router.post("/upload-profile-pic")
 async def upload_profile_pic(email: str, file: UploadFile = File(...)):

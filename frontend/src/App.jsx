@@ -10,18 +10,21 @@ import axios from "axios";
 import { API_BASE_URL } from "./config";
 
 function App() {
+  const email = sessionStorage.getItem("email");
+
   useEffect(() => {
-    const email = sessionStorage.getItem("email");
     if (!email) return;
 
     const pulse = () => {
-      axios.post(`${API_BASE_URL}/auth/pulse`, { email }).catch(() => {});
+      const currentEmail = sessionStorage.getItem("email");
+      if (!currentEmail) return;
+      axios.post(`${API_BASE_URL}/auth/pulse`, { email: currentEmail }).catch(() => {});
     };
 
     pulse(); // Initial pulse
     const interval = setInterval(pulse, 30000); // Pulse every 30 seconds
     return () => clearInterval(interval);
-  }, []);
+  }, [email]);
 
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");

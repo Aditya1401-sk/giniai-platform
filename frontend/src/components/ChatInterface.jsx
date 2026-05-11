@@ -109,7 +109,11 @@ const ChatInterface = ({ roleTitle }) => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      const email = sessionStorage.getItem("email");
+      if (email) await axios.post(`${API_BASE_URL}/auth/offline`, { email });
+    } catch (e) {}
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     sessionStorage.removeItem("email");
