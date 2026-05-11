@@ -221,25 +221,32 @@ const ChatInterface = ({ roleTitle }) => {
       const decoder = new TextDecoder();
       let accumulatedResponse = "";
       setIsTyping(false);
+      
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
         accumulatedResponse += decoder.decode(value, { stream: true });
-        setChatHistory(prev => { const h = [...prev]; h[h.length - 1] = { ...h[h.length - 1], content: accumulatedResponse }; return h; });
-        setSessions(prev => {
-          const updated = prev.map(s => s.id === activeSessionId ? {
-            ...s,
-            messages: [...updatedHistory, { ...botPlaceholder, content: accumulatedResponse }],
-            title: s.messages.length === 0 ? userContent.substring(0, 30) + "..." : s.title
-          } : s);
-          // Save only when done for efficiency, but here we can save once title is generated
-          if (done) {
-             const session = updated.find(s => s.id === activeSessionId);
-             saveSessionToCloud(session);
-          }
-          return updated;
+        
+        setChatHistory(prev => { 
+          const h = [...prev]; 
+          h[h.length - 1] = { ...h[h.length - 1], content: accumulatedResponse }; 
+          return h; 
         });
+
+        setSessions(prev => prev.map(s => s.id === activeSessionId ? {
+          ...s,
+          messages: [...updatedHistory, { ...botPlaceholder, content: accumulatedResponse }],
+          title: s.messages.length === 0 ? userContent.substring(0, 30) + (userContent.length > 30 ? "..." : "") : s.title
+        } : s));
       }
+      
+      // Save the complete session to cloud AFTER the stream is finished
+      setSessions(prev => {
+        const session = prev.find(s => s.id === activeSessionId);
+        if (session) saveSessionToCloud(session);
+        return prev;
+      });
+
     } catch (error) {
       console.error("Stream error:", error);
       setIsTyping(false);
